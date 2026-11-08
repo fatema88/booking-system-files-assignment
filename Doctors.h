@@ -19,10 +19,19 @@ struct IndexEntry {
     int offset;
 };
 
+struct SecondaryIndexNode {
+    char key[30];
+    int primaryIndex;
+    int next;
+};
+extern IndexEntry doctorIndex[MAX_DOCTORS];
+extern int indexSize;
+
 // Doctor File
 void initializeDoctorFile();
 void addDoctor();
 void printDoctor();
+
 
 // Primary Index 
 void loadDoctorIndex();
