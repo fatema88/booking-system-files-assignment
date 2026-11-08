@@ -6,13 +6,13 @@
 #include <cstring>
 #include <algorithm>
 #include "Doctors.h"
+#include "FileUtilities.h"
 
 using namespace std;
 
 // Primary Index
 IndexEntry doctorIndex[MAX_DOCTORS];
 int indexSize = 0;
-
 
 // Read input
 bool readLine(char dest[], int size) {
@@ -31,30 +31,12 @@ bool readLine(char dest[], int size) {
 
 
 // Initialize Doctors File
+
 void initializeDoctorFile() {
 
-    ifstream check("doctors.dat", ios::binary);
-
-    if (check) {
-        check.seekg(0, ios::end);
-
-        if (check.tellg() >= sizeof(int))
-            return;
-    }
-
-    ofstream file("doctors.dat",
-        ios::binary | ios::trunc);
-
-    if (!file) {
+    if (!initializeDataFile("doctors.dat"))
         cout << "Error creating doctors file!\n";
-        return;
-    }
-
-    int header = -1;
-
-    file.write((char*)&header, sizeof(int));
 }
-
 
 // save Primary Index
 void saveDoctorIndex() {
@@ -221,91 +203,13 @@ void addDoctor() {
         return;
 
 
-    // open doctors File
-    fstream file("doctors.dat",
-        ios::in | ios::out | ios::binary);
-
-    if (!file) {
-        cout << "Cannot open doctors file!\n";
-        return;
-    }
-
-    // Read AVAIL LIST Header
-    int head;
-
-    file.read((char*)&head, sizeof(int));
-
-    if (!file) {
-        cout << "Cannot read header!\n";
-        return;
-    }
-
+    // Insert Doctor using FileUtilities
     int offset;
 
-
-    if (head != -1) {
-
-        // Reuse deleted record
-
-        file.seekg(0, ios::end);
-        int fileSize = (int)file.tellg();
-
-        if (head < sizeof(int) ||
-            (head - sizeof(int)) % sizeof(Doctor) != 0 ||
-            head + 1 + sizeof(int) > fileSize) {
-
-            cout << "Invalid AVAIL LIST!\n";
-            return;
-        }
-
-        offset = head;
-
-        // Read next deleted record offset
-        char marker;
-        int next;
-
-        file.seekg(offset);
-
-        file.read(&marker, sizeof(char));
-        file.read((char*)&next, sizeof(int));
-
-        if (!file || marker != '*') {
-            cout << "Invalid deleted record!\n";
-            return;
-        }
-
-        // Write new Doctor in deleted location
-        file.clear();
-        file.seekp(offset);
-
-        file.write((char*)&d, sizeof(Doctor));
-
-        // Update Header
-        file.seekp(0);
-
-        file.write((char*)&next, sizeof(int));
-
-    }
-
-    else {
-
-        // Append at end of file
-
-        file.clear();
-        file.seekp(0, ios::end);
-
-        offset = (int)file.tellp();
-
-        file.write((char*)&d, sizeof(Doctor));
-    }
-
-    if (!file) {
+    if (!insertRecord("doctors.dat", &d, sizeof(Doctor), offset)) {
         cout << "Error writing doctor!\n";
         return;
     }
-
-    file.close();
-
 
     // Insert Doctor into sorted Primary Index
 
@@ -370,28 +274,15 @@ void printDoctor() {
         return;
     }
 
-    // Open Doctors File
-    ifstream file("doctors.dat", ios::binary);
-
-    if (!file) {
-        cout << "Cannot open doctors file!\n";
-        return;
-    }
-
     Doctor d = {};
 
-    // Go to Doctor Record using Offset
-    file.seekg(doctorIndex[pos].offset);
+    if (!readRecord("doctors.dat",
+        doctorIndex[pos].offset,
+        &d, sizeof(Doctor))) {
 
-    file.read((char*)&d, sizeof(Doctor));
-
-    if (!file) {
         cout << "Error reading doctor!\n";
         return;
     }
-
-    file.close();
-
     // Print Doctor Information
     cout << "\n------ Doctor Information ------\n";
 
