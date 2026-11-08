@@ -9,7 +9,7 @@ The system allows an administrator to manage doctors and their appointments usin
 |---|---|
 | Fatma Tarek Mostafa | 20242237 |
 | Alaa Wafiq Samy | 20242050 |
-| Eman Saad Mostafa | 20422064 |
+| Eman Saad Mostafa |20242064 |
 | Mariam Badawy Abdelsattar | 20242326 |
 | Nawal Mahmoud Abdelalim | 20242375 |
 
@@ -177,7 +177,7 @@ HealthcareSystem.exe
 |---|---|
 | Fatma Tarek Mostafa | 20242237 |
 | Alaa Wafiq Samy | 20242050 |
-| Eman Saad Mostafa | 20422064 |
+| Eman Saad Mostafa | 20242064 |
 | Mariam Badawy Abdelsattar | 20242326 |
 | Nawal Mahmoud Abdelalim | 20242375 |
 
