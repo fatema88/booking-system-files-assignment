@@ -7,14 +7,13 @@
 #include <algorithm>
 #include "Doctors.h"
 #include "FileUtilities.h"
+#include "DoctorNameIndex.h"
+#include "DoctorSpecialtyIndex.h"
 
 using namespace std;
-
-// Primary Index
 IndexEntry doctorIndex[MAX_DOCTORS];
 int indexSize = 0;
 
-// Read input
 bool readLine(char dest[], int size) {
 
     cin.getline(dest, size);
@@ -28,7 +27,6 @@ bool readLine(char dest[], int size) {
 
     return true;
 }
-
 
 // Initialize Doctors File
 
@@ -231,12 +229,12 @@ void addDoctor() {
 
    
     saveDoctorIndex();
+    rebuildDoctorNameIndex();
+  rebuildDoctorSpecialtyIndex();
 
     cout << "\nDoctor added successfully!\n";
 }
 
-
-// Display Primary Index
 void displayDoctorIndex() {
 
     loadDoctorIndex();
@@ -252,8 +250,6 @@ void displayDoctorIndex() {
     }
 }
 
-
-// Print Doctor
 void printDoctor() {
 
     char searchID[15] = {};
@@ -283,7 +279,7 @@ void printDoctor() {
         cout << "Error reading doctor!\n";
         return;
     }
-    // Print Doctor Information
+  
     cout << "\n------ Doctor Information ------\n";
 
     cout << "ID: " << d.id << endl;
