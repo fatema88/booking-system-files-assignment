@@ -6,7 +6,9 @@
 #include <cstring>                
 #include "Doctors.h"
 #include "appointment.h"
-#include "FileUtilities.h"       
+#include "FileUtilities.h"  
+#include "DoctorNameIndex.h"
+#include "DoctorSpecialtyIndex.h"
 
 using namespace std;
 
@@ -95,6 +97,8 @@ int main() {
         cout << "5. Print Appointment\n";
         cout << "6. Display Appointment Index\n";
         cout << "7. Search Appointments by Doctor ID\n";   
+         cout << "8. Search Doctor by Name\n";
+        cout << "9. Search Doctor by Specialty\n";
         cout << "0. Exit\n";
 
         cout << "Enter choice: ";
@@ -165,6 +169,25 @@ int main() {
             cout << "Total: " << list.size() << endl;
             break;
         }
+           case 8: {
+     char name[30];
+
+     cout << "\nEnter Doctor Name: ";
+     cin.getline(name, 30);
+
+     searchDoctorByName(name);
+     break;
+ }
+
+ case 9: {
+     char specialty[30];
+
+     cout << "\nEnter Doctor Specialty: ";
+     cin.getline(specialty, 30);
+
+     searchDoctorBySpecialty(specialty);
+     break;
+ }
 
         case 0:
             cout << "Goodbye!\n";
