@@ -30,5 +30,6 @@ void saveDoctorIndex();
 void rebuildDoctorIndex();
 int binarySearchDoctor(const char searchID[]);
 void displayDoctorIndex();
+bool readLine(char dest[], int size);
 
 #endif
