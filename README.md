@@ -3,6 +3,15 @@
 A C++ based Healthcare Management System developed as part of **File Management and Processing (IS321) – Assignment 1**, Academic Year 2026/2027, at the Faculty of Computers and Artificial Intelligence, Cairo University.
 
 The system allows an administrator to manage doctors and their appointments using binary file storage, fixed-length records, indexing techniques, and file management operations.
+## 👥 Team Members
+
+| Name | University ID |
+|---|---|
+| Fatma Tarek Mostafa | 20242237 |
+| Alaa Wafiq Samy | 20242050 |
+| Eman Saad Mostafa | 20422064 |
+| Mariam Badawy Abdelsattar | 20242326 |
+| Nawal Mahmoud Abdelalim | 20242375 |
 
 ## 📌 Project Overview
 
