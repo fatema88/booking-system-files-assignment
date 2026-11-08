@@ -1,24 +1,24 @@
-#define _CRT_SECURE_NO_WARNINGS   // جديد
+#define _CRT_SECURE_NO_WARNINGS // جديد
 
 #include <iostream>
 #include <string>
 #include <vector>
-#include <cstring>                
+#include <cstring>
 #include "Doctors.h"
 #include "appointment.h"
-#include "FileUtilities.h"  
+#include "FileUtilities.h"
 #include "DoctorNameIndex.h"
 #include "DoctorSpecialtyIndex.h"
 
 using namespace std;
 
-
-static void insertDoctor(const char* id, const char* name,
-                         const char* specialty, const char* address) {
+static void insertDoctor(const char *id, const char *name,
+                         const char *specialty, const char *address)
+{
 
     loadDoctorIndex();
 
-    if (binarySearchDoctor(id) != -1)   
+    if (binarySearchDoctor(id) != -1)
         return;
 
     Doctor d = {};
@@ -31,12 +31,13 @@ static void insertDoctor(const char* id, const char* name,
     insertRecord("doctors.dat", &d, sizeof(Doctor), offset);
 }
 
-static void insertAppointment(const char* id, const char* date,
-                              const char* doctorID) {
+static void insertAppointment(const char *id, const char *date,
+                              const char *doctorID)
+{
 
     loadAppointmentIndex();
 
-    if (binarySearchAppointment(id) != -1)  
+    if (binarySearchAppointment(id) != -1)
         return;
 
     Appointment a = {};
@@ -48,16 +49,15 @@ static void insertAppointment(const char* id, const char* date,
     insertRecord("Appointments.dat", &a, sizeof(Appointment), offset);
 }
 
-static void insertSampleData() {
+static void insertSampleData()
+{
 
-  
-    insertDoctor("D1", "Ali",  "Cardio", "Cairo");
-    insertDoctor("D2", "Omar", "Neuro",  "Giza");
-    insertDoctor("D3", "Mona", "Derma",  "Alex");
-    insertDoctor("D4", "Sara", "Eye",    "Tanta");
-    insertDoctor("D5", "Hany", "Bones",  "Aswan");
+    insertDoctor("D1", "Ali", "Cardio", "Cairo");
+    insertDoctor("D2", "Omar", "Neuro", "Giza");
+    insertDoctor("D3", "Mona", "Derma", "Alex");
+    insertDoctor("D4", "Sara", "Eye", "Tanta");
+    insertDoctor("D5", "Hany", "Bones", "Aswan");
 
-   
     insertAppointment("A01", "2026-11-18", "D1");
     insertAppointment("A02", "2026-11-19", "D1");
     insertAppointment("A03", "2026-11-20", "D1");
@@ -75,18 +75,18 @@ static void insertSampleData() {
     rebuildAppointmentSecondaryIndex();
 }
 
-
-
-int main() {
+int main()
+{
 
     initializeDoctorFile();
     initializeAppointmentFile();
 
-    insertSampleData();           
+    insertSampleData();
 
     int choice;
 
-    do {
+    do
+    {
 
         cout << "\n===== Healthcare System =====\n";
 
@@ -96,14 +96,17 @@ int main() {
         cout << "4. Add Appointment\n";
         cout << "5. Print Appointment\n";
         cout << "6. Display Appointment Index\n";
-        cout << "7. Search Appointments by Doctor ID\n";   
-         cout << "8. Search Doctor by Name\n";
+        cout << "7. Search Appointments by Doctor ID\n";
+        cout << "8. Search Doctor by Name\n";
         cout << "9. Search Doctor by Specialty\n";
+        cout << "10. Update Appointment Date\n";
+        cout << "11. Delete Appointment\n";
         cout << "0. Exit\n";
 
         cout << "Enter choice: ";
 
-        if (!(cin >> choice)) {
+        if (!(cin >> choice))
+        {
 
             if (cin.eof())
                 break;
@@ -116,7 +119,8 @@ int main() {
 
         cin.ignore(10000, '\n');
 
-        switch (choice) {
+        switch (choice)
+        {
 
         case 1:
             addDoctor();
@@ -134,7 +138,8 @@ int main() {
             addAppointment();
             break;
 
-        case 5: {
+        case 5:
+        {
             string id;
             cout << "\nEnter Appointment ID: ";
             getline(cin, id);
@@ -146,22 +151,24 @@ int main() {
             displayAppointmentIndex();
             break;
 
-        
-        case 7: {
+        case 7:
+        {
             string doctorID;
             cout << "\nEnter Doctor ID: ";
             getline(cin, doctorID);
 
             vector<Appointment> list = searchAppointmentsByDoctor(doctorID);
 
-            if (list.empty()) {
+            if (list.empty())
+            {
                 cout << "No appointments found for this doctor!\n";
                 break;
             }
 
             cout << "\n------ Appointments of Doctor " << doctorID << " ------\n";
 
-            for (size_t i = 0; i < list.size(); i++) {
+            for (size_t i = 0; i < list.size(); i++)
+            {
                 cout << "ID: " << list[i].appointmentID
                      << " | Date: " << list[i].appointmentDate << endl;
             }
@@ -169,25 +176,45 @@ int main() {
             cout << "Total: " << list.size() << endl;
             break;
         }
-           case 8: {
-     char name[30];
+        case 8:
+        {
+            char name[30];
 
-     cout << "\nEnter Doctor Name: ";
-     cin.getline(name, 30);
+            cout << "\nEnter Doctor Name: ";
+            cin.getline(name, 30);
 
-     searchDoctorByName(name);
-     break;
- }
+            searchDoctorByName(name);
+            break;
+        }
 
- case 9: {
-     char specialty[30];
+        case 9:
+        {
+            char specialty[30];
 
-     cout << "\nEnter Doctor Specialty: ";
-     cin.getline(specialty, 30);
+            cout << "\nEnter Doctor Specialty: ";
+            cin.getline(specialty, 30);
 
-     searchDoctorBySpecialty(specialty);
-     break;
- }
+            searchDoctorBySpecialty(specialty);
+            break;
+        }
+
+        case 10:
+        {
+            string id;
+            cout << "\nEnter Appointment ID: ";
+            getline(cin, id);
+            updateAppointmentDate(id);
+            break;
+        }
+
+        case 11:
+        {
+            string id;
+            cout << "\nEnter Appointment ID: ";
+            getline(cin, id);
+            deleteAppointment(id);
+            break;
+        }
 
         case 0:
             cout << "Goodbye!\n";

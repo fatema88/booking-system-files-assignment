@@ -21,36 +21,38 @@ const string APPOINTMENT_INDEX_FILE = "appointment_index.dat";
 AppointmentIndexEntry appointmentIndex[MAX_APPOINTMENTS];
 int appointmentIndexSize = 0;
 
-
 // =====================================================================
 //  Data file
 // =====================================================================
 
-void initializeAppointmentFile() {
+void initializeAppointmentFile()
+{
     if (!initializeDataFile(APPOINTMENT_FILE))
         cout << "Error creating appointments file!\n";
 }
-
 
 // =====================================================================
 //  Primary Index: Appointment ID -> offset in Appointments.dat
 // =====================================================================
 
-void saveAppointmentIndex() {
+void saveAppointmentIndex()
+{
 
     ofstream file(APPOINTMENT_INDEX_FILE, ios::binary | ios::trunc);
 
-    if (!file) {
+    if (!file)
+    {
         cout << "Error saving appointment index!\n";
         return;
     }
 
-    file.write(reinterpret_cast<char*>(&appointmentIndexSize), sizeof(int));
-    file.write(reinterpret_cast<char*>(appointmentIndex),
-        appointmentIndexSize * sizeof(AppointmentIndexEntry));
+    file.write(reinterpret_cast<char *>(&appointmentIndexSize), sizeof(int));
+    file.write(reinterpret_cast<char *>(appointmentIndex),
+               appointmentIndexSize * sizeof(AppointmentIndexEntry));
 }
 
-void rebuildAppointmentIndex() {
+void rebuildAppointmentIndex()
+{
 
     appointmentIndexSize = 0;
 
@@ -59,19 +61,21 @@ void rebuildAppointmentIndex() {
     if (!file)
         return;
 
-    file.seekg(sizeof(int), ios::beg);   // skip the header record
+    file.seekg(sizeof(int), ios::beg); // skip the header record
 
     Appointment a;
     int offset = sizeof(int);
 
-    while (file.read(reinterpret_cast<char*>(&a), sizeof(Appointment))) {
+    while (file.read(reinterpret_cast<char *>(&a), sizeof(Appointment)))
+    {
 
         // ignore logically deleted records
         if (a.appointmentID[0] != '*' &&
-            appointmentIndexSize < MAX_APPOINTMENTS) {
+            appointmentIndexSize < MAX_APPOINTMENTS)
+        {
 
             strcpy(appointmentIndex[appointmentIndexSize].appointmentID,
-                a.appointmentID);
+                   a.appointmentID);
             appointmentIndex[appointmentIndexSize].offset = offset;
             appointmentIndexSize++;
         }
@@ -83,47 +87,54 @@ void rebuildAppointmentIndex() {
 
     // sort ascending by Appointment ID
     sort(appointmentIndex, appointmentIndex + appointmentIndexSize,
-        [](const AppointmentIndexEntry& x, const AppointmentIndexEntry& y) {
-            return strcmp(x.appointmentID, y.appointmentID) < 0;
-        });
+         [](const AppointmentIndexEntry &x, const AppointmentIndexEntry &y)
+         {
+             return strcmp(x.appointmentID, y.appointmentID) < 0;
+         });
 
     saveAppointmentIndex();
 }
 
-void loadAppointmentIndex() {
+void loadAppointmentIndex()
+{
 
     ifstream file(APPOINTMENT_INDEX_FILE, ios::binary);
 
-    if (!file) {
+    if (!file)
+    {
         rebuildAppointmentIndex();
         return;
     }
 
-    file.read(reinterpret_cast<char*>(&appointmentIndexSize), sizeof(int));
+    file.read(reinterpret_cast<char *>(&appointmentIndexSize), sizeof(int));
 
     if (!file || appointmentIndexSize < 0 ||
-        appointmentIndexSize > MAX_APPOINTMENTS) {
+        appointmentIndexSize > MAX_APPOINTMENTS)
+    {
         file.close();
         rebuildAppointmentIndex();
         return;
     }
 
-    file.read(reinterpret_cast<char*>(appointmentIndex),
-        appointmentIndexSize * sizeof(AppointmentIndexEntry));
+    file.read(reinterpret_cast<char *>(appointmentIndex),
+              appointmentIndexSize * sizeof(AppointmentIndexEntry));
 
-    if (!file) {
+    if (!file)
+    {
         file.close();
         rebuildAppointmentIndex();
         return;
     }
 }
 
-int binarySearchAppointment(const char* appointmentID) {
+int binarySearchAppointment(const char *appointmentID)
+{
 
     int left = 0;
     int right = appointmentIndexSize - 1;
 
-    while (left <= right) {
+    while (left <= right)
+    {
 
         int mid = (left + right) / 2;
         int result = strcmp(appointmentIndex[mid].appointmentID, appointmentID);
@@ -140,18 +151,19 @@ int binarySearchAppointment(const char* appointmentID) {
     return -1;
 }
 
-void displayAppointmentIndex() {
+void displayAppointmentIndex()
+{
 
     loadAppointmentIndex();
 
     cout << "\n------ Appointment Primary Index ------\n";
 
-    for (int i = 0; i < appointmentIndexSize; i++) {
+    for (int i = 0; i < appointmentIndexSize; i++)
+    {
         cout << "ID: " << appointmentIndex[i].appointmentID
-            << " | Offset: " << appointmentIndex[i].offset << endl;
+             << " | Offset: " << appointmentIndex[i].offset << endl;
     }
 }
-
 
 // =====================================================================
 //  Secondary Index: Doctor ID -> linked list (on a different file)
@@ -164,14 +176,17 @@ void displayAppointmentIndex() {
 //  All pointers (head, next) are ints = node numbers, -1 = end.
 // =====================================================================
 
-namespace {
+namespace
+{
 
-    struct SecondaryEntry {
+    struct SecondaryEntry
+    {
         char doctorID[15];
         int head;
     };
 
-    struct ListNode {
+    struct ListNode
+    {
         char appointmentID[15];
         int next;
     };
@@ -182,12 +197,14 @@ namespace {
     SecondaryEntry secondaryIndex[MAX_APPOINTMENTS];
     int secondaryIndexSize = 0;
 
-    int binarySearchSecondary(const char* doctorID) {
+    int binarySearchSecondary(const char *doctorID)
+    {
 
         int left = 0;
         int right = secondaryIndexSize - 1;
 
-        while (left <= right) {
+        while (left <= right)
+        {
 
             int mid = (left + right) / 2;
             int result = strcmp(secondaryIndex[mid].doctorID, doctorID);
@@ -205,12 +222,14 @@ namespace {
     }
 
     // insert a new doctor into the sorted secondary index (shifting)
-    void insertSecondaryEntry(const char* doctorID, int head) {
+    void insertSecondaryEntry(const char *doctorID, int head)
+    {
 
         int pos = secondaryIndexSize;
 
         while (pos > 0 &&
-            strcmp(secondaryIndex[pos - 1].doctorID, doctorID) > 0) {
+               strcmp(secondaryIndex[pos - 1].doctorID, doctorID) > 0)
+        {
 
             secondaryIndex[pos] = secondaryIndex[pos - 1];
             pos--;
@@ -221,43 +240,49 @@ namespace {
         secondaryIndexSize++;
     }
 
-    void saveSecondaryIndex() {
+    void saveSecondaryIndex()
+    {
 
         ofstream file(SECONDARY_INDEX_FILE, ios::binary | ios::trunc);
 
-        if (!file) {
+        if (!file)
+        {
             cout << "Error saving appointment secondary index!\n";
             return;
         }
 
-        file.write(reinterpret_cast<char*>(&secondaryIndexSize), sizeof(int));
-        file.write(reinterpret_cast<char*>(secondaryIndex),
-            secondaryIndexSize * sizeof(SecondaryEntry));
+        file.write(reinterpret_cast<char *>(&secondaryIndexSize), sizeof(int));
+        file.write(reinterpret_cast<char *>(secondaryIndex),
+                   secondaryIndexSize * sizeof(SecondaryEntry));
     }
 
     // returns true if loaded from the files, false if it had to rebuild
-    bool loadSecondaryIndex() {
+    bool loadSecondaryIndex()
+    {
 
         ifstream listCheck(DOCTOR_LIST_FILE, ios::binary);
         ifstream file(SECONDARY_INDEX_FILE, ios::binary);
 
-        if (!file || !listCheck) {
+        if (!file || !listCheck)
+        {
             rebuildAppointmentSecondaryIndex();
             return false;
         }
 
-        file.read(reinterpret_cast<char*>(&secondaryIndexSize), sizeof(int));
+        file.read(reinterpret_cast<char *>(&secondaryIndexSize), sizeof(int));
 
         if (!file || secondaryIndexSize < 0 ||
-            secondaryIndexSize > MAX_APPOINTMENTS) {
+            secondaryIndexSize > MAX_APPOINTMENTS)
+        {
             rebuildAppointmentSecondaryIndex();
             return false;
         }
 
-        file.read(reinterpret_cast<char*>(secondaryIndex),
-            secondaryIndexSize * sizeof(SecondaryEntry));
+        file.read(reinterpret_cast<char *>(secondaryIndex),
+                  secondaryIndexSize * sizeof(SecondaryEntry));
 
-        if (!file) {
+        if (!file)
+        {
             rebuildAppointmentSecondaryIndex();
             return false;
         }
@@ -267,7 +292,8 @@ namespace {
 
     // Called by addAppointment after the record and the primary index
     // were saved.
-    void addToSecondaryIndex(const char* doctorID, const char* appointmentID) {
+    void addToSecondaryIndex(const char *doctorID, const char *appointmentID)
+    {
 
         // if the files were missing, the rebuild already included this
         // appointment (it is in the data file), so there is nothing to add
@@ -287,12 +313,14 @@ namespace {
 
         int pos = binarySearchSecondary(doctorID);
 
-        if (pos == -1) {
+        if (pos == -1)
+        {
             // first appointment of this doctor
             n.next = -1;
             insertSecondaryEntry(doctorID, nodeNumber);
         }
-        else {
+        else
+        {
             // new node goes to the front of the doctor's list
             n.next = secondaryIndex[pos].head;
             secondaryIndex[pos].head = nodeNumber;
@@ -300,23 +328,24 @@ namespace {
 
         ofstream list(DOCTOR_LIST_FILE, ios::binary | ios::app);
 
-        if (!list) {
+        if (!list)
+        {
             cout << "Error updating appointment list file!\n";
             return;
         }
 
-        list.write(reinterpret_cast<char*>(&n), sizeof(ListNode));
+        list.write(reinterpret_cast<char *>(&n), sizeof(ListNode));
         list.close();
 
         saveSecondaryIndex();
     }
 
-}   // end of anonymous namespace
-
+} // end of anonymous namespace
 
 // Rebuild both the secondary index and the linked-list file from the
 // primary index + the data file. (Call it after any delete / key update.)
-void rebuildAppointmentSecondaryIndex() {
+void rebuildAppointmentSecondaryIndex()
+{
 
     loadAppointmentIndex();
 
@@ -324,12 +353,13 @@ void rebuildAppointmentSecondaryIndex() {
 
     vector<ListNode> nodes;
 
-    for (int i = 0; i < appointmentIndexSize; i++) {
+    for (int i = 0; i < appointmentIndexSize; i++)
+    {
 
         Appointment a = {};
 
         if (!readRecord(APPOINTMENT_FILE, appointmentIndex[i].offset,
-            &a, sizeof(Appointment)))
+                        &a, sizeof(Appointment)))
             continue;
 
         int nodeNumber = (int)nodes.size();
@@ -339,11 +369,13 @@ void rebuildAppointmentSecondaryIndex() {
 
         int pos = binarySearchSecondary(a.doctorID);
 
-        if (pos == -1) {
+        if (pos == -1)
+        {
             n.next = -1;
             insertSecondaryEntry(a.doctorID, nodeNumber);
         }
-        else {
+        else
+        {
             n.next = secondaryIndex[pos].head;
             secondaryIndex[pos].head = nodeNumber;
         }
@@ -353,14 +385,15 @@ void rebuildAppointmentSecondaryIndex() {
 
     ofstream list(DOCTOR_LIST_FILE, ios::binary | ios::trunc);
 
-    if (!list) {
+    if (!list)
+    {
         cout << "Error creating appointment list file!\n";
         return;
     }
 
     if (!nodes.empty())
-        list.write(reinterpret_cast<char*>(nodes.data()),
-            nodes.size() * sizeof(ListNode));
+        list.write(reinterpret_cast<char *>(nodes.data()),
+                   nodes.size() * sizeof(ListNode));
 
     list.close();
 
@@ -369,7 +402,8 @@ void rebuildAppointmentSecondaryIndex() {
 
 // Doctor ID -> secondary index (binary search) -> linked list of
 // Appointment IDs -> primary index (binary search) -> offset -> record
-vector<Appointment> searchAppointmentsByDoctor(const string& doctorID) {
+vector<Appointment> searchAppointmentsByDoctor(const string &doctorID)
+{
 
     vector<Appointment> result;
 
@@ -389,21 +423,23 @@ vector<Appointment> searchAppointmentsByDoctor(const string& doctorID) {
     int current = secondaryIndex[pos].head;
     int steps = 0;
 
-    while (current != -1 && steps++ < 100000) {
+    while (current != -1 && steps++ < 100000)
+    {
 
         ListNode n = {};
         list.clear();
         list.seekg((streamoff)current * sizeof(ListNode), ios::beg);
 
-        if (!list.read(reinterpret_cast<char*>(&n), sizeof(n)))
+        if (!list.read(reinterpret_cast<char *>(&n), sizeof(n)))
             break;
 
         int p = binarySearchAppointment(n.appointmentID);
 
-        if (p != -1) {
+        if (p != -1)
+        {
             Appointment a = {};
             if (readRecord(APPOINTMENT_FILE, appointmentIndex[p].offset,
-                &a, sizeof(Appointment)))
+                           &a, sizeof(Appointment)))
                 result.push_back(a);
         }
 
@@ -413,12 +449,12 @@ vector<Appointment> searchAppointmentsByDoctor(const string& doctorID) {
     return result;
 }
 
-
 // =====================================================================
 //  Operations
 // =====================================================================
 
-void addAppointment() {
+void addAppointment()
+{
 
     Appointment a = {};
 
@@ -427,7 +463,8 @@ void addAppointment() {
     if (!readLine(a.appointmentID, 15))
         return;
 
-    if (a.appointmentID[0] == '\0' || a.appointmentID[0] == '*') {
+    if (a.appointmentID[0] == '\0' || a.appointmentID[0] == '*')
+    {
         cout << "Invalid Appointment ID!\n";
         return;
     }
@@ -435,12 +472,14 @@ void addAppointment() {
     loadAppointmentIndex();
 
     // an existing appointment is never written again
-    if (binarySearchAppointment(a.appointmentID) != -1) {
+    if (binarySearchAppointment(a.appointmentID) != -1)
+    {
         cout << "Appointment ID already exists!\n";
         return;
     }
 
-    if (appointmentIndexSize >= MAX_APPOINTMENTS) {
+    if (appointmentIndexSize >= MAX_APPOINTMENTS)
+    {
         cout << "Maximum number of appointments reached!\n";
         return;
     }
@@ -458,7 +497,8 @@ void addAppointment() {
     // the doctor must already exist
     loadDoctorIndex();
 
-    if (binarySearchDoctor(a.doctorID) == -1) {
+    if (binarySearchDoctor(a.doctorID) == -1)
+    {
         cout << "Doctor not found! Add the doctor first.\n";
         return;
     }
@@ -466,7 +506,8 @@ void addAppointment() {
     // write the record: first available AVAIL LIST slot, else append
     int offset;
 
-    if (!insertRecord(APPOINTMENT_FILE, &a, sizeof(Appointment), offset)) {
+    if (!insertRecord(APPOINTMENT_FILE, &a, sizeof(Appointment), offset))
+    {
         cout << "Error writing appointment!\n";
         return;
     }
@@ -475,7 +516,8 @@ void addAppointment() {
     int pos = appointmentIndexSize;
 
     while (pos > 0 &&
-        strcmp(appointmentIndex[pos - 1].appointmentID, a.appointmentID) > 0) {
+           strcmp(appointmentIndex[pos - 1].appointmentID, a.appointmentID) > 0)
+    {
 
         appointmentIndex[pos] = appointmentIndex[pos - 1];
         pos--;
@@ -493,13 +535,15 @@ void addAppointment() {
     cout << "\nAppointment added successfully!\n";
 }
 
-void printAppointment(const string& appointmentID) {
+void printAppointment(const string &appointmentID)
+{
 
     loadAppointmentIndex();
 
     int pos = binarySearchAppointment(appointmentID.c_str());
 
-    if (pos == -1) {
+    if (pos == -1)
+    {
         cout << "Appointment not found!\n";
         return;
     }
@@ -507,7 +551,8 @@ void printAppointment(const string& appointmentID) {
     Appointment a = {};
 
     if (!readRecord(APPOINTMENT_FILE, appointmentIndex[pos].offset,
-        &a, sizeof(Appointment))) {
+                    &a, sizeof(Appointment)))
+    {
         cout << "Error reading appointment!\n";
         return;
     }
@@ -517,4 +562,104 @@ void printAppointment(const string& appointmentID) {
     cout << "Date: " << a.appointmentDate << endl;
     cout << "Doctor ID: " << a.doctorID << endl;
     cout << "-------------------------------------\n";
+}
+
+// Update appointment date
+void updateAppointmentDate(const string &appointmentID)
+{
+
+    loadAppointmentIndex();
+
+    int pos = binarySearchAppointment(appointmentID.c_str());
+
+    if (pos == -1)
+    {
+        cout << "Appointment not found!\n";
+        return;
+    }
+
+    Appointment a = {};
+
+    if (!readRecord(APPOINTMENT_FILE, appointmentIndex[pos].offset,
+                    &a, sizeof(Appointment)))
+    {
+        cout << "Error reading appointment!\n";
+        return;
+    }
+
+    char newDate[30] = {};
+
+    cout << "Enter New Appointment Date: ";
+
+    // reject longer than the 30
+    if (!readLine(newDate, 30))
+        return;
+
+    if (newDate[0] == '\0')
+    {
+        cout << "Invalid date!\n";
+        return;
+    }
+
+    memset(a.appointmentDate, 0, sizeof(a.appointmentDate));
+    strcpy(a.appointmentDate, newDate);
+
+    // overwrite the record in place (same offset, same 60 bytes)
+    fstream file(APPOINTMENT_FILE, ios::in | ios::out | ios::binary);
+
+    if (!file)
+    {
+        cout << "Error opening appointments file!\n";
+        return;
+    }
+
+    file.seekp(appointmentIndex[pos].offset, ios::beg);
+    file.write(reinterpret_cast<char *>(&a), sizeof(Appointment));
+
+    if (!file)
+    {
+        cout << "Error updating appointment!\n";
+        return;
+    }
+
+    file.close();
+
+    cout << "\nAppointment date updated successfully!\n";
+}
+
+// Delete appointment
+void deleteAppointment(const string &appointmentID)
+{
+
+    loadAppointmentIndex();
+
+    int pos = binarySearchAppointment(appointmentID.c_str());
+
+    if (pos == -1)
+    {
+        cout << "Warning: Appointment not found!\n";
+        return;
+    }
+
+    // puts '*' on the record, links it to the old AVAIL LIST head
+    // and makes the header point to it
+    if (!deleteRecord(APPOINTMENT_FILE, appointmentIndex[pos].offset,
+                      sizeof(Appointment)))
+    {
+        cout << "Error deleting appointment!\n";
+        return;
+    }
+
+    // remove the entry from the sorted primary index (shifting left)
+    for (int i = pos; i < appointmentIndexSize - 1; i++)
+        appointmentIndex[i] = appointmentIndex[i + 1];
+
+    appointmentIndexSize--;
+
+    saveAppointmentIndex();
+
+    // the Doctor ID linked list must not contain the deleted appointment
+    rebuildAppointmentSecondaryIndex();
+
+    cout << "\nAppointment deleted successfully!\n";
 }

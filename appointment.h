@@ -24,6 +24,8 @@ struct AppointmentIndexEntry {
 void initializeAppointmentFile();
 void addAppointment();
 void printAppointment(const std::string& appointmentID);
+void updateAppointmentDate(const std::string& appointmentID);
+void deleteAppointment(const std::string& appointmentID);
 
 // Appointment primary index
 void loadAppointmentIndex();
