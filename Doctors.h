@@ -4,7 +4,8 @@
 
 const int MAX_DOCTORS = 100;
 
-struct Doctor {
+struct Doctor
+{
     char id[15];
     char name[30];
     char specialty[20];
@@ -12,14 +13,16 @@ struct Doctor {
 };
 
 static_assert(sizeof(Doctor) == 95,
-    "Doctor record must be 95 bytes");
+              "Doctor record must be 95 bytes");
 
-struct IndexEntry {
+struct IndexEntry
+{
     char id[15];
     int offset;
 };
 
-struct SecondaryIndexNode {
+struct SecondaryIndexNode
+{
     char key[30];
     int primaryIndex;
     int next;
@@ -32,13 +35,17 @@ void initializeDoctorFile();
 void addDoctor();
 void printDoctor();
 
-
-// Primary Index 
+// Primary Index
 void loadDoctorIndex();
 void saveDoctorIndex();
 void rebuildDoctorIndex();
 int binarySearchDoctor(const char searchID[]);
 void displayDoctorIndex();
 bool readLine(char dest[], int size);
+
+// Update and Delete
+void updateDoctorName();
+void updateDoctorID();
+void deleteDoctor();
 
 #endif

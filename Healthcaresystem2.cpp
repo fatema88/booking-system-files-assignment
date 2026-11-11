@@ -101,6 +101,9 @@ int main()
         cout << "9. Search Doctor by Specialty\n";
         cout << "10. Update Appointment Date\n";
         cout << "11. Delete Appointment\n";
+        cout << "12. Update Doctor Name\n";
+        cout << "13. Update Doctor ID\n";
+        cout << "14. Delete Doctor\n";
         cout << "0. Exit\n";
 
         cout << "Enter choice: ";
@@ -215,6 +218,17 @@ int main()
             deleteAppointment(id);
             break;
         }
+        case 12:
+            updateDoctorName();
+            break;
+
+        case 13:
+            updateDoctorID();
+            break;
+
+        case 14:
+            deleteDoctor();
+            break;
 
         case 0:
             cout << "Goodbye!\n";
