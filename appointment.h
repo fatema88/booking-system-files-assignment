@@ -1,6 +1,9 @@
 #ifndef APPOINTMENT_H
 #define APPOINTMENT_H
 
+//extern AppointmentIndexEntry appointmentIndex[MAX_APPOINTMENTS];
+//extern int appointmentIndexSize;
+
 #include <string>
 #include <vector>
 
@@ -19,6 +22,9 @@ struct AppointmentIndexEntry {
     char appointmentID[15];
     int offset;
 };
+
+extern AppointmentIndexEntry appointmentIndex[MAX_APPOINTMENTS];
+extern int appointmentIndexSize;
 
 // Appointment data file and operations
 void initializeAppointmentFile();

@@ -1,5 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS // جديد
 
+
 #include <iostream>
 #include <string>
 #include <vector>
@@ -9,6 +10,7 @@
 #include "FileUtilities.h"
 #include "DoctorNameIndex.h"
 #include "DoctorSpecialtyIndex.h"
+#include "QueryEngine.h"
 
 using namespace std;
 
@@ -104,6 +106,7 @@ int main()
         cout << "12. Update Doctor Name\n";
         cout << "13. Update Doctor ID\n";
         cout << "14. Delete Doctor\n";
+        cout << "15. Write Query\n";
         cout << "0. Exit\n";
 
         cout << "Enter choice: ";
@@ -228,6 +231,9 @@ int main()
 
         case 14:
             deleteDoctor();
+            break;
+        case 15:
+            executeQuery();
             break;
 
         case 0:
