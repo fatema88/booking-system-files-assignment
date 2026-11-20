@@ -106,22 +106,17 @@ int main()
 
         cout << "\n===== Healthcare System =====\n";
 
-        cout << "1. Add Doctor\n";
-        cout << "2. Print Doctor\n";
-        cout << "3. Display Doctor Index\n";
-        cout << "4. Add Appointment\n";
-        cout << "5. Print Appointment\n";
-        cout << "6. Display Appointment Index\n";
-        cout << "7. Search Appointments by Doctor ID\n";
-        cout << "8. Search Doctor by Name\n";
-        cout << "9. Search Doctor by Specialty\n";
-        cout << "10. Update Appointment Date\n";
-        cout << "11. Delete Appointment\n";
-        cout << "12. Update Doctor Name\n";
-        cout << "13. Update Doctor ID\n";
-        cout << "14. Delete Doctor\n";
-        cout << "15. Write Query\n";
-        cout << "0. Exit\n";
+               cout << "1. Add New Doctor\n";
+        cout << "2. Add New Appointment\n";
+        cout << "3. Update Doctor Name (Doctor ID)\n";
+        cout << "4. Update Doctor ID [Key Update Test]\n";
+        cout << "5. Update Appointment Date (Appointment ID)\n";
+        cout << "6. Delete Appointment (Appointment ID)\n";
+        cout << "7. Delete Doctor (Doctor ID)\n";
+        cout << "8. Print Doctor Info (Doctor ID)\n";
+        cout << "9. Print Appointment Info (Appointment ID)\n";
+        cout << "10. Write Query\n";
+        cout << "11. Exit\n";
 
         cout << "Enter choice: ";
 
@@ -139,86 +134,25 @@ int main()
 
         cin.ignore(10000, '\n');
 
-        switch (choice)
+                switch (choice)
         {
-
         case 1:
             addDoctor();
             break;
 
         case 2:
-            printDoctor();
-            break;
-
-        case 3:
-            displayDoctorIndex();
-            break;
-
-        case 4:
             addAppointment();
             break;
 
+        case 3:
+            updateDoctorName();
+            break;
+
+        case 4:
+            updateDoctorID();
+            break;
+
         case 5:
-        {
-            string id;
-            cout << "\nEnter Appointment ID: ";
-            getline(cin, id);
-            printAppointment(id);
-            break;
-        }
-
-        case 6:
-            displayAppointmentIndex();
-            break;
-
-        case 7:
-        {
-            string doctorID;
-            cout << "\nEnter Doctor ID: ";
-            getline(cin, doctorID);
-
-            vector<Appointment> list = searchAppointmentsByDoctor(doctorID);
-
-            if (list.empty())
-            {
-                cout << "No appointments found for this doctor!\n";
-                break;
-            }
-
-            cout << "\n------ Appointments of Doctor " << doctorID << " ------\n";
-
-            for (size_t i = 0; i < list.size(); i++)
-            {
-                cout << "ID: " << list[i].appointmentID
-                     << " | Date: " << list[i].appointmentDate << endl;
-            }
-
-            cout << "Total: " << list.size() << endl;
-            break;
-        }
-        case 8:
-        {
-            char name[30];
-
-            cout << "\nEnter Doctor Name: ";
-            cin.getline(name, 30);
-
-            searchDoctorByName(name);
-            break;
-        }
-
-        case 9:
-        {
-            char specialty[30];
-
-            cout << "\nEnter Doctor Specialty: ";
-            cin.getline(specialty, 30);
-
-            searchDoctorBySpecialty(specialty);
-            break;
-        }
-
-        case 10:
         {
             string id;
             cout << "\nEnter Appointment ID: ";
@@ -227,7 +161,7 @@ int main()
             break;
         }
 
-        case 11:
+        case 6:
         {
             string id;
             cout << "\nEnter Appointment ID: ";
@@ -235,22 +169,29 @@ int main()
             deleteAppointment(id);
             break;
         }
-        case 12:
-            updateDoctorName();
-            break;
 
-        case 13:
-            updateDoctorID();
-            break;
-
-        case 14:
+        case 7:
             deleteDoctor();
             break;
-        case 15:
+
+        case 8:
+            printDoctor();
+            break;
+
+        case 9:
+        {
+            string id;
+            cout << "\nEnter Appointment ID: ";
+            getline(cin, id);
+            printAppointment(id);
+            break;
+        }
+
+        case 10:
             executeQuery();
             break;
 
-        case 0:
+        case 11:
             cout << "Goodbye!\n";
             break;
 
@@ -258,7 +199,7 @@ int main()
             cout << "Invalid choice!\n";
         }
 
-    } while (choice != 0);
+    } while (choice != 11);
 
     return 0;
 }
