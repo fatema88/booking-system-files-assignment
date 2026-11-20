@@ -1,10 +1,10 @@
-#define _CRT_SECURE_NO_WARNINGS // جديد
-
+#define _CRT_SECURE_NO_WARNINGS 
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <cstring>
+#include <fstream> // [MODIFIED #2] needed for isEmptyDataFile
 #include "Doctors.h"
 #include "appointment.h"
 #include "FileUtilities.h"
@@ -13,6 +13,14 @@
 #include "QueryEngine.h"
 
 using namespace std;
+
+// [MODIFIED #2] START: true if the data file has only the 4-byte header (no records)
+static bool isEmptyDataFile(const char *fileName)
+{
+    ifstream in(fileName, ios::binary | ios::ate);
+    return in && in.tellg() <= (streamoff)sizeof(int);
+}
+// [MODIFIED #2] END
 
 static void insertDoctor(const char *id, const char *name,
                          const char *specialty, const char *address)
@@ -73,6 +81,8 @@ static void insertSampleData()
 
     // بناء كل الـ indexes من ملفات البيانات
     rebuildDoctorIndex();
+    rebuildDoctorNameIndex();      // [MODIFIED #2] was missing
+    rebuildDoctorSpecialtyIndex(); // [MODIFIED #2] was missing
     rebuildAppointmentIndex();
     rebuildAppointmentSecondaryIndex();
 }
@@ -83,7 +93,11 @@ int main()
     initializeDoctorFile();
     initializeAppointmentFile();
 
-    insertSampleData();
+    // [MODIFIED #2] START: sample data only on the very first run (both files empty),
+    // so deleted doctors/appointments do not come back after restart
+    if (isEmptyDataFile("doctors.dat") && isEmptyDataFile("Appointments.dat"))
+        insertSampleData();
+    // [MODIFIED #2] END
 
     int choice;
 

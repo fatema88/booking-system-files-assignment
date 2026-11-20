@@ -33,6 +33,10 @@ void printAppointment(const std::string& appointmentID);
 void updateAppointmentDate(const std::string& appointmentID);
 void deleteAppointment(const std::string& appointmentID);
 
+// [MODIFIED #3] START: called after a Doctor ID key update (keeps the foreign key valid)
+void updateAppointmentsDoctorID(const char* oldID, const char* newID);
+// [MODIFIED #3] END
+
 // Appointment primary index
 void loadAppointmentIndex();
 void saveAppointmentIndex();

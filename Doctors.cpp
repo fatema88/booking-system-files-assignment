@@ -1,4 +1,3 @@
-
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <iostream>
@@ -6,6 +5,7 @@
 #include <cstring>
 #include <algorithm>
 #include "Doctors.h"
+#include "appointment.h" // [MODIFIED #3] for updateAppointmentsDoctorID
 #include "FileUtilities.h"
 #include "DoctorNameIndex.h"
 #include "DoctorSpecialtyIndex.h"
@@ -404,6 +404,10 @@ void updateDoctorID()
     file.seekp(doctorIndex[pos].offset, ios::beg);
     file.write((char *)&d, sizeof(Doctor));
     file.close();
+
+    // [MODIFIED #3] START: keep appointments' Doctor ID (foreign key) consistent
+    updateAppointmentsDoctorID(oldID, newID);
+    // [MODIFIED #3] END
 
     // Update the index entry with the new ID
     IndexEntry temp = doctorIndex[pos];

@@ -663,3 +663,45 @@ void deleteAppointment(const string &appointmentID)
 
     cout << "\nAppointment deleted successfully!\n";
 }
+
+// [MODIFIED #3] START
+// Doctor ID changed -> update the Doctor ID (foreign key) inside every
+// appointment of that doctor, then rebuild the Doctor ID secondary index.
+void updateAppointmentsDoctorID(const char *oldID, const char *newID)
+{
+
+    loadAppointmentIndex();
+
+    fstream file(APPOINTMENT_FILE, ios::in | ios::out | ios::binary);
+
+    if (!file)
+        return;
+
+    for (int i = 0; i < appointmentIndexSize; i++)
+    {
+
+        Appointment a = {};
+
+        if (!readRecord(APPOINTMENT_FILE, appointmentIndex[i].offset,
+                        &a, sizeof(Appointment)))
+            continue;
+
+        if (strcmp(a.doctorID, oldID) != 0)
+            continue;
+
+        memset(a.doctorID, 0, sizeof(a.doctorID));
+        strcpy(a.doctorID, newID);
+
+        // overwrite in place (same offset, same 60 bytes)
+        file.clear();
+        file.seekp(appointmentIndex[i].offset, ios::beg);
+        file.write(reinterpret_cast<char *>(&a), sizeof(Appointment));
+        file.flush();
+    }
+
+    file.close();
+
+    // the secondary index (Doctor ID -> linked list) must use the new ID
+    rebuildAppointmentSecondaryIndex();
+}
+// [MODIFIED #3] END
