@@ -340,7 +340,7 @@ void updateDoctorName()
     cout << "Enter New Doctor Name: ";
     if (!readLine(newName, 30))
         return;
-
+    memset(d.name, 0, sizeof(d.name)); // Clear the old name
     strcpy(d.name, newName);
 
     // Update the record in the file
@@ -397,6 +397,7 @@ void updateDoctorID()
         cout << "Error reading doctor!\n";
         return;
     }
+    memset(d.id, 0, sizeof(d.id)); // Clear the old ID
     strcpy(d.id, newID);
 
     // Update the record in the file
@@ -411,6 +412,7 @@ void updateDoctorID()
 
     // Update the index entry with the new ID
     IndexEntry temp = doctorIndex[pos];
+    memset(temp.id, 0, sizeof(temp.id)); // Clear the old ID
     strcpy(temp.id, newID);
 
     // 1.remove the old entry from the index
