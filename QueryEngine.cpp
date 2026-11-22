@@ -60,11 +60,10 @@ namespace
 
     string upperCase(string s)
     {
-        for (char& c : s)
+        for (char &c : s)
         {
             c = static_cast<char>(
-                toupper(static_cast<unsigned char>(c))
-                );
+                toupper(static_cast<unsigned char>(c)));
         }
 
         return s;
@@ -100,7 +99,7 @@ namespace
     }
 
     // Find AND outside quotation marks
-    size_t findAndOutsideQuotes(const string& s, size_t start)
+    size_t findAndOutsideQuotes(const string &s, size_t start)
     {
         char quote = '\0';
 
@@ -133,7 +132,7 @@ namespace
     }
 
     // Find '=' outside quotation marks
-    size_t findEqualOutsideQuotes(const string& s)
+    size_t findEqualOutsideQuotes(const string &s)
     {
         char quote = '\0';
 
@@ -167,10 +166,10 @@ namespace
     // =================================================
 
     bool parseQuery(
-        const string& query,
-        string& selectedField,
-        string& tableName,
-        vector<pair<string, string>>& conditions)
+        const string &query,
+        string &selectedField,
+        string &tableName,
+        vector<pair<string, string>> &conditions)
     {
         conditions.clear();
 
@@ -205,16 +204,13 @@ namespace
             return false;
 
         selectedField = normalizeField(
-            q.substr(7, fromPos - 7)
-        );
+            q.substr(7, fromPos - 7));
 
         tableName = upperCase(trim(
-            q.substr(fromPos + 6, wherePos - fromPos - 6)
-        ));
+            q.substr(fromPos + 6, wherePos - fromPos - 6)));
 
         string wherePart = trim(
-            q.substr(wherePos + 7)
-        );
+            q.substr(wherePos + 7));
 
         if (selectedField.empty() ||
             tableName.empty() ||
@@ -229,8 +225,7 @@ namespace
         while (start < wherePart.size())
         {
             size_t andPos = findAndOutsideQuotes(
-                wherePart, start
-            );
+                wherePart, start);
 
             string condition;
 
@@ -242,8 +237,7 @@ namespace
             else
             {
                 condition = trim(
-                    wherePart.substr(start, andPos - start)
-                );
+                    wherePart.substr(start, andPos - start));
 
                 start = andPos + 5;
             }
@@ -257,12 +251,10 @@ namespace
                 return false;
 
             string field = normalizeField(
-                condition.substr(0, equalPos)
-            );
+                condition.substr(0, equalPos));
 
             string value = trim(
-                condition.substr(equalPos + 1)
-            );
+                condition.substr(equalPos + 1));
 
             if (field.empty() ||
                 value.size() < 2)
@@ -272,9 +264,8 @@ namespace
 
             // Validate quotation marks
             if (!(
-                (value.front() == '\'' && value.back() == '\'') ||
-                (value.front() == '"' && value.back() == '"')
-                ))
+                    (value.front() == '\'' && value.back() == '\'') ||
+                    (value.front() == '"' && value.back() == '"')))
             {
                 return false;
             }
@@ -284,7 +275,7 @@ namespace
             if (value.empty())
                 return false;
 
-            conditions.push_back({ field, value });
+            conditions.push_back({field, value});
         }
 
         return !conditions.empty();
@@ -294,7 +285,7 @@ namespace
     // Doctor Primary Index
     // =================================================
 
-    bool getDoctorByID(const string& id, Doctor& d)
+    bool getDoctorByID(const string &id, Doctor &d)
     {
         loadDoctorIndex();
 
@@ -307,8 +298,7 @@ namespace
             "doctors.dat",
             doctorIndex[pos].offset,
             &d,
-            sizeof(Doctor)
-        );
+            sizeof(Doctor));
     }
 
     vector<Doctor> getAllDoctors()
@@ -322,10 +312,10 @@ namespace
             Doctor d = {};
 
             if (readRecord(
-                "doctors.dat",
-                doctorIndex[i].offset,
-                &d,
-                sizeof(Doctor)))
+                    "doctors.dat",
+                    doctorIndex[i].offset,
+                    &d,
+                    sizeof(Doctor)))
             {
                 results.push_back(d);
             }
@@ -338,7 +328,7 @@ namespace
     // Doctor Name Secondary Index
     // =================================================
 
-    vector<Doctor> getDoctorsByName(const string& name)
+    vector<Doctor> getDoctorsByName(const string &name)
     {
         vector<Doctor> results;
 
@@ -364,7 +354,7 @@ namespace
 
         int size = 0;
 
-        file.read((char*)&size, sizeof(int));
+        file.read((char *)&size, sizeof(int));
 
         if (!file || size < 0 || size > MAX_DOCTORS)
             return results;
@@ -374,9 +364,8 @@ namespace
         if (size > 0)
         {
             file.read(
-                (char*)index.data(),
-                size * sizeof(NameIndexEntry)
-            );
+                (char *)index.data(),
+                size * sizeof(NameIndexEntry));
 
             if (!file)
                 return results;
@@ -395,8 +384,7 @@ namespace
 
             int cmp = strcmp(
                 index[mid].key,
-                name.c_str()
-            );
+                name.c_str());
 
             if (cmp == 0)
             {
@@ -424,7 +412,7 @@ namespace
 
         int listSize = 0;
 
-        listFile.read((char*)&listSize, sizeof(int));
+        listFile.read((char *)&listSize, sizeof(int));
 
         if (!listFile ||
             listSize < 0 ||
@@ -438,9 +426,8 @@ namespace
         if (listSize > 0)
         {
             listFile.read(
-                (char*)list.data(),
-                listSize * sizeof(ListNode)
-            );
+                (char *)list.data(),
+                listSize * sizeof(ListNode));
 
             if (!listFile)
                 return results;
@@ -478,7 +465,7 @@ namespace
     // =================================================
 
     vector<Doctor> getDoctorsBySpecialty(
-        const string& specialty)
+        const string &specialty)
     {
         vector<Doctor> results;
 
@@ -487,8 +474,7 @@ namespace
         // Rebuild index if file does not exist
         ifstream checkIndex(
             "DoctorSpecialtyIndex.dat",
-            ios::binary
-        );
+            ios::binary);
 
         if (!checkIndex)
         {
@@ -502,15 +488,14 @@ namespace
         // Open Specialty Index
         ifstream file(
             "DoctorSpecialtyIndex.dat",
-            ios::binary
-        );
+            ios::binary);
 
         if (!file)
             return results;
 
         int size = 0;
 
-        file.read((char*)&size, sizeof(int));
+        file.read((char *)&size, sizeof(int));
 
         if (!file || size < 0 || size > MAX_DOCTORS)
             return results;
@@ -520,9 +505,8 @@ namespace
         if (size > 0)
         {
             file.read(
-                (char*)index.data(),
-                size * sizeof(SpecialtyIndexEntry)
-            );
+                (char *)index.data(),
+                size * sizeof(SpecialtyIndexEntry));
 
             if (!file)
                 return results;
@@ -541,8 +525,7 @@ namespace
 
             int cmp = strcmp(
                 index[mid].key,
-                specialty.c_str()
-            );
+                specialty.c_str());
 
             if (cmp == 0)
             {
@@ -565,15 +548,14 @@ namespace
         // Open Specialty Linked List
         ifstream listFile(
             "DoctorSpecialtyList.dat",
-            ios::binary
-        );
+            ios::binary);
 
         if (!listFile)
             return results;
 
         int listSize = 0;
 
-        listFile.read((char*)&listSize, sizeof(int));
+        listFile.read((char *)&listSize, sizeof(int));
 
         if (!listFile ||
             listSize < 0 ||
@@ -587,9 +569,8 @@ namespace
         if (listSize > 0)
         {
             listFile.read(
-                (char*)list.data(),
-                listSize * sizeof(ListNode)
-            );
+                (char *)list.data(),
+                listSize * sizeof(ListNode));
 
             if (!listFile)
                 return results;
@@ -627,11 +608,11 @@ namespace
     // =================================================
 
     bool matchesDoctorCondition(
-        const Doctor& d,
-        const pair<string, string>& condition)
+        const Doctor &d,
+        const pair<string, string> &condition)
     {
-        const string& field = condition.first;
-        const string& value = condition.second;
+        const string &field = condition.first;
+        const string &value = condition.second;
 
         if (field == "DOCTOR ID")
             return strcmp(d.id, value.c_str()) == 0;
@@ -653,8 +634,8 @@ namespace
     // =================================================
 
     void printDoctorResults(
-        const vector<Doctor>& doctors,
-        const string& selectedField)
+        const vector<Doctor> &doctors,
+        const string &selectedField)
     {
         if (doctors.empty())
         {
@@ -662,7 +643,7 @@ namespace
             return;
         }
 
-        for (const Doctor& d : doctors)
+        for (const Doctor &d : doctors)
         {
             cout << "\n--------------------------\n";
 
@@ -699,8 +680,8 @@ namespace
     // =================================================
 
     void printAppointmentResults(
-        const vector<Appointment>& appointments,
-        const string& selectedField)
+        const vector<Appointment> &appointments,
+        const string &selectedField)
     {
         if (appointments.empty())
         {
@@ -708,7 +689,7 @@ namespace
             return;
         }
 
-        for (const Appointment& a : appointments)
+        for (const Appointment &a : appointments)
         {
             cout << "\n--------------------------\n";
 
@@ -716,21 +697,21 @@ namespace
                 selectedField == "APPOINTMENT ID")
             {
                 cout << "Appointment ID: "
-                    << a.appointmentID << endl;
+                     << a.appointmentID << endl;
             }
 
             if (selectedField == "ALL" ||
                 selectedField == "APPOINTMENT DATE")
             {
                 cout << "Appointment Date: "
-                    << a.appointmentDate << endl;
+                     << a.appointmentDate << endl;
             }
 
             if (selectedField == "ALL" ||
                 selectedField == "DOCTOR ID")
             {
                 cout << "Doctor ID: "
-                    << a.doctorID << endl;
+                     << a.doctorID << endl;
             }
         }
 
@@ -738,7 +719,6 @@ namespace
     }
 
 } // End anonymous namespace
-
 
 // =====================================================
 // Execute Query
@@ -758,10 +738,10 @@ void executeQuery()
     vector<pair<string, string>> conditions;
 
     if (!parseQuery(
-        query,
-        selectedField,
-        tableName,
-        conditions))
+            query,
+            selectedField,
+            tableName,
+            conditions))
     {
         cout << "\nInvalid Query Syntax!\n";
         return;
@@ -785,7 +765,7 @@ void executeQuery()
         }
 
         // Validate WHERE Fields
-        for (const auto& c : conditions)
+        for (const auto &c : conditions)
         {
             if (c.first != "DOCTOR ID" &&
                 c.first != "DOCTOR NAME" &&
@@ -802,7 +782,7 @@ void executeQuery()
         bool foundIndexedCondition = false;
 
         // Choose an indexed condition to retrieve candidates
-        for (const auto& c : conditions)
+        for (const auto &c : conditions)
         {
             if (c.first == "DOCTOR ID")
             {
@@ -841,11 +821,11 @@ void executeQuery()
         // Apply all conditions (AND)
         vector<Doctor> results;
 
-        for (const Doctor& d : candidates)
+        for (const Doctor &d : candidates)
         {
             bool matches = true;
 
-            for (const auto& c : conditions)
+            for (const auto &c : conditions)
             {
                 if (!matchesDoctorCondition(d, c))
                 {
@@ -869,64 +849,67 @@ void executeQuery()
     {
         if (conditions.size() != 1)
         {
-            cout << "Appointments support one condition intments ====================
-
-    else if (tableName == "Appointments")
-    {
-        vector<Appointment> results;
-
-        if (conditions.size() != 1)
-        {
             cout << "Appointments support one condition only!\n";
             return;
         }
 
-        string field = conditions[0].first;
-        string value = conditions[0].second;
-
-        if (field == "Doctor ID")
+        else if (tableName == "Appointments")
         {
-            results = searchAppointmentsByDoctor(value);
-        }
-        else if (field == "Appointment ID")
-        {
-            loadAppointmentIndex();
+            vector<Appointment> results;
 
-            int pos = binarySearchAppointment(value.c_str());
-
-            if (pos != -1)
+            if (conditions.size() != 1)
             {
-                Appointment a = {};
+                cout << "Appointments support one condition only!\n";
+                return;
+            }
 
-                if (readRecord(
-                    "Appointments.dat",
-                    appointmentIndex[pos].offset,
-                    &a,
-                    sizeof(Appointment)))
+            string field = conditions[0].first;
+            string value = conditions[0].second;
+
+            if (field == "Doctor ID")
+            {
+                results = searchAppointmentsByDoctor(value);
+            }
+            else if (field == "Appointment ID")
+            {
+                loadAppointmentIndex();
+
+                int pos = binarySearchAppointment(value.c_str());
+
+                if (pos != -1)
                 {
-                    results.push_back(a);
+                    Appointment a = {};
+
+                    if (readRecord(
+                            "Appointments.dat",
+                            appointmentIndex[pos].offset,
+                            &a,
+                            sizeof(Appointment)))
+                    {
+                        results.push_back(a);
+                    }
                 }
             }
+            else
+            {
+                cout << "Unsupported Appointment Field!\n";
+                return;
+            }
+
+            if (selectedField != "ALL" &&
+                selectedField != "Appointment ID" &&
+                selectedField != "Appointment Date" &&
+                selectedField != "Doctor ID")
+            {
+                cout << "Invalid SELECT Field!\n";
+                return;
+            }
+
+            printAppointmentResults(results, selectedField);
         }
         else
         {
-            cout << "Unsupported Appointment Field!\n";
-            return;
+            cout << "Unknown Table Name!\n";
         }
-
-        if (selectedField != "ALL" &&
-            selectedField != "Appointment ID" &&
-            selectedField != "Appointment Date" &&
-            selectedField != "Doctor ID")
-        {
-            cout << "Invalid SELECT Field!\n";
-            return;
-        }
-
-        printAppointmentResults(results, selectedField);
-    }
-    else
-    {
-        cout << "Unknown Table Name!\n";
     }
 }

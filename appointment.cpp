@@ -705,3 +705,38 @@ void updateAppointmentsDoctorID(const char *oldID, const char *newID)
     rebuildAppointmentSecondaryIndex();
 }
 // [MODIFIED #3] END
+
+void deleteAppointmentsByDoctor(const char *doctorID)
+{
+    // find all appointments of the doctor, then delete them one by one
+    vector<Appointment> doctorAppointments = searchAppointmentsByDoctor(doctorID);
+
+    if (doctorAppointments.empty())
+        return;
+
+    loadAppointmentIndex();
+
+    for (size_t i = 0; i < doctorAppointments.size(); i++)
+    {
+        int pos = binarySearchAppointment(doctorAppointments[i].appointmentID);
+        if (pos == -1)
+            continue;
+
+        // delete the record from the data file and remove it from the primary index
+        if (deleteRecord(APPOINTMENT_FILE, appointmentIndex[pos].offset, sizeof(Appointment)))
+        {
+            // remove the entry from the sorted primary index (shifting left)
+            for (int j = pos; j < appointmentIndexSize - 1; j++)
+            {
+                appointmentIndex[j] = appointmentIndex[j + 1];
+            }
+            appointmentIndexSize--;
+        }
+    }
+
+    // save the primary index and rebuild the secondary index after deleting appointments
+    saveAppointmentIndex();
+    rebuildAppointmentSecondaryIndex();
+
+    cout << doctorAppointments.size() << " associated appointment(s) deleted.\n";
+}

@@ -459,6 +459,9 @@ void deleteDoctor()
         return;
     }
 
+    // [MODIFIED #3] START: delete all appointments of the doctor to maintain referential integrity
+    deleteAppointmentsByDoctor(searchID);
+
     // call deleteRecord from FileUtilities to mark the record as deleted
     if (!deleteRecord("doctors.dat", doctorIndex[pos].offset, sizeof(Doctor)))
     {
