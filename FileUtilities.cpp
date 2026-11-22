@@ -55,7 +55,7 @@ bool insertRecord(
 
     int availHead = -1;
     file.seekg(0, ios::beg);
-    file.read(reinterpret_cast<char*>(&availHead), sizeof(availHead));
+    file.read(reinterpret_cast<char*>(&availHead), sizeof(availHead));//read the head of the available list and store it in availHead
 
     if (!file)
         return false;

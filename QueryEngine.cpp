@@ -845,7 +845,7 @@ void executeQuery()
     // APPOINTMENTS TABLE
     // =================================================
 
-    else if (tableName == "APPOINTMENTS")
+       else if (tableName == "APPOINTMENTS")
     {
         if (conditions.size() != 1)
         {
@@ -853,63 +853,49 @@ void executeQuery()
             return;
         }
 
-        else if (tableName == "Appointments")
+        if (selectedField != "ALL" &&
+            selectedField != "APPOINTMENT ID" &&
+            selectedField != "APPOINTMENT DATE" &&
+            selectedField != "DOCTOR ID")
         {
-            vector<Appointment> results;
+            cout << "Invalid SELECT Field!\n";
+            return;
+        }
 
-            if (conditions.size() != 1)
+        vector<Appointment> results;
+        string field = conditions[0].first;
+        string value = conditions[0].second;
+
+        if (field == "DOCTOR ID")
+        {
+            // secondary index (Doctor ID -> linked list -> primary index)
+            results = searchAppointmentsByDoctor(value);
+        }
+        else if (field == "APPOINTMENT ID")
+        {
+            // primary index
+            loadAppointmentIndex();
+            int pos = binarySearchAppointment(value.c_str());
+
+            if (pos != -1)
             {
-                cout << "Appointments support one condition only!\n";
-                return;
+                Appointment a = {};
+                if (readRecord("Appointments.dat",
+                               appointmentIndex[pos].offset,
+                               &a, sizeof(Appointment)))
+                    results.push_back(a);
             }
-
-            string field = conditions[0].first;
-            string value = conditions[0].second;
-
-            if (field == "Doctor ID")
-            {
-                results = searchAppointmentsByDoctor(value);
-            }
-            else if (field == "Appointment ID")
-            {
-                loadAppointmentIndex();
-
-                int pos = binarySearchAppointment(value.c_str());
-
-                if (pos != -1)
-                {
-                    Appointment a = {};
-
-                    if (readRecord(
-                            "Appointments.dat",
-                            appointmentIndex[pos].offset,
-                            &a,
-                            sizeof(Appointment)))
-                    {
-                        results.push_back(a);
-                    }
-                }
-            }
-            else
-            {
-                cout << "Unsupported Appointment Field!\n";
-                return;
-            }
-
-            if (selectedField != "ALL" &&
-                selectedField != "Appointment ID" &&
-                selectedField != "Appointment Date" &&
-                selectedField != "Doctor ID")
-            {
-                cout << "Invalid SELECT Field!\n";
-                return;
-            }
-
-            printAppointmentResults(results, selectedField);
         }
         else
         {
-            cout << "Unknown Table Name!\n";
+            cout << "Unsupported Appointment Field!\n";
+            return;
         }
+
+        printAppointmentResults(results, selectedField);
+    }
+    else
+    {
+        cout << "Unknown Table Name!\n";
     }
 }
